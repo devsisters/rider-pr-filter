@@ -1,6 +1,6 @@
 # Rider PR File Filter Plugin
 
-Rider의 Pull Request 화면에서 파일을 확장자 패턴으로 필터링할 수 있는 플러그인입니다.
+Rider의 Github Pull Request View에서 파일을 확장자 패턴으로 필터링할 수 있는 플러그인입니다.
 
 ## 기능
 
