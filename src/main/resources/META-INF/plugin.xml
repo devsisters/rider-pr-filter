@@ -1,0 +1,21 @@
+<idea-plugin>
+    <id>com.devsisters.rider-pr-filter</id>
+    <name>PR File Filter</name>
+    <vendor email="dev@devsisters.com" url="https://devsisters.com">Devsisters</vendor>
+
+    <description><![CDATA[
+    Adds file filtering functionality to Pull Request view in Rider.
+    Displays a search bar in PR views to filter files by wildcard patterns like *.cs, *.json, etc.
+    ]]></description>
+
+    <depends>com.intellij.modules.rider</depends>
+    <depends>com.intellij.modules.vcs</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Settings -->
+        <applicationService serviceImplementation="com.devsisters.prfilter.PRFilterSettings"/>
+
+        <!-- Post Startup Activity to add search bar to PR views -->
+        <postStartupActivity implementation="com.devsisters.prfilter.PRViewDecorator"/>
+    </extensions>
+</idea-plugin>
