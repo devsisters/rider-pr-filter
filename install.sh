@@ -61,21 +61,65 @@ if [ ${#RIDER_VERSIONS[@]} -eq 0 ]; then
     exit 1
 fi
 
-# 가장 최신 버전 자동 선택 (이미 sort -r로 내림차순 정렬됨)
-SELECTED_INDEX=0
-SELECTED_VERSION=$(basename "${RIDER_VERSIONS[$SELECTED_INDEX]}")
-
+# 설치할 Rider 버전 선택
 echo "발견된 Rider 설치:"
 for i in "${!RIDER_VERSIONS[@]}"; do
     VERSION_NAME=$(basename "${RIDER_VERSIONS[$i]}")
-    if [ $i -eq $SELECTED_INDEX ]; then
-        echo "  ✓ $VERSION_NAME (자동 선택)"
+    if [ $i -eq 0 ]; then
+        printf "  [%d] %s (최신)\n" "$((i + 1))" "$VERSION_NAME"
     else
-        echo "    $VERSION_NAME"
+        printf "  [%d] %s\n" "$((i + 1))" "$VERSION_NAME"
     fi
 done
 echo ""
-echo "→ 가장 최신 버전에 설치: $SELECTED_VERSION"
+
+SELECTED_INDEX=""
+
+# 1) 커맨드라인 인자로 번호 또는 버전 이름을 지정한 경우
+if [ -n "${1:-}" ]; then
+    if [[ "$1" =~ ^[0-9]+$ ]] && [ "$1" -ge 1 ] && [ "$1" -le ${#RIDER_VERSIONS[@]} ]; then
+        SELECTED_INDEX=$(($1 - 1))
+    else
+        for i in "${!RIDER_VERSIONS[@]}"; do
+            if [ "$(basename "${RIDER_VERSIONS[$i]}")" = "$1" ]; then
+                SELECTED_INDEX=$i
+                break
+            fi
+        done
+    fi
+
+    if [ -z "$SELECTED_INDEX" ]; then
+        echo "❌ 잘못된 인자입니다: $1"
+        echo "   번호(1-${#RIDER_VERSIONS[@]}) 또는 위 목록의 버전 이름을 지정하세요."
+        exit 1
+    fi
+    echo "→ 인자로 선택됨: $(basename "${RIDER_VERSIONS[$SELECTED_INDEX]}")"
+# 2) 대화형 입력으로 직접 선택
+elif [ -t 0 ]; then
+    while true; do
+        if ! read -r -p "설치할 버전 번호를 선택하세요 [1-${#RIDER_VERSIONS[@]}] (기본값: 1): " CHOICE; then
+            echo ""
+            echo "❌ 설치를 취소했습니다."
+            exit 1
+        fi
+        CHOICE="${CHOICE:-1}"
+        if [[ "$CHOICE" =~ ^[0-9]+$ ]] && [ "$CHOICE" -ge 1 ] && [ "$CHOICE" -le ${#RIDER_VERSIONS[@]} ]; then
+            SELECTED_INDEX=$((CHOICE - 1))
+            break
+        fi
+        echo "  ⚠️  1에서 ${#RIDER_VERSIONS[@]} 사이의 번호를 입력하세요."
+    done
+# 3) 비대화형 실행(파이프 등)이면 최신 버전으로 진행
+else
+    SELECTED_INDEX=0
+    echo "ℹ️  비대화형 실행이므로 최신 버전을 사용합니다."
+    echo "   특정 버전을 설치하려면: ./install.sh <번호|버전이름>"
+fi
+
+SELECTED_VERSION=$(basename "${RIDER_VERSIONS[$SELECTED_INDEX]}")
+
+echo ""
+echo "→ 선택된 버전: $SELECTED_VERSION"
 
 # 플러그인 디렉토리 경로
 PLUGINS_DIR="${RIDER_VERSIONS[$SELECTED_INDEX]}/plugins"
