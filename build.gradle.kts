@@ -33,7 +33,9 @@ tasks {
 
     patchPluginXml {
         sinceBuild.set("233")
-        untilBuild.set("253.*")
+        // 상한 없음: 사내 배포용이라 IDE 업그레이드마다 재빌드하지 않도록 until-build를 생략한다.
+        // (빈 문자열을 지정하면 plugin.xml에 until-build 속성이 기록되지 않는다)
+        untilBuild.set("")
     }
 }
 
