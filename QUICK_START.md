@@ -1,5 +1,30 @@
 # Quick Start Guide
 
+## 사전 요구사항
+
+| 항목 | 버전 | 비고 |
+|------|------|------|
+| JDK | **21** | IntelliJ Platform 2024.2+ 가 JDK 21에서 동작합니다. |
+| Gradle | **9.0 이상** | Wrapper가 자동으로 받으므로 직접 설치할 필요 없습니다. |
+
+JDK가 없다면 (macOS / Homebrew):
+
+```bash
+brew install openjdk@21
+
+# /usr/libexec/java_home 이 인식하도록 링크 (sudo 불필요)
+mkdir -p ~/Library/Java/JavaVirtualMachines
+ln -sfn /opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk \
+        ~/Library/Java/JavaVirtualMachines/openjdk-21.jdk
+
+# 확인
+/usr/libexec/java_home -v 21
+```
+
+> Gradle 9 미만이나 JDK 17에서는 빌드되지 않습니다.
+> IntelliJ Platform Gradle Plugin 2.x가 Gradle 9.0+ 를 요구하고,
+> Rider 2026.2 SDK는 JDK 21로 컴파일되어 있습니다.
+
 ## 빠른 시작
 
 ### 1. 빌드하기
@@ -7,27 +32,20 @@
 #### Option A: 빌드 스크립트 사용 (권장)
 
 ```bash
-cd /Users/devsisters/dev/rider-pr-filter
 ./build.sh
 ```
 
-#### Option B: Gradle 직접 사용
+#### Option B: Gradle Wrapper 직접 사용
 
 ```bash
-# Gradle 8.5 사용 (SDKMAN 설치 필요)
-sdk install gradle 8.5
-sdk use gradle 8.5
-
-# 빌드
-gradle buildPlugin
-
-# 또는 wrapper 사용
 ./gradlew buildPlugin
 ```
 
+Wrapper가 필요한 Gradle 버전을 알아서 받아오므로 Gradle을 따로 설치할 필요가 없습니다.
+
 #### Option C: IntelliJ IDEA 사용
 
-1. IntelliJ IDEA에서 `/Users/devsisters/dev/rider-pr-filter` 프로젝트 열기
+1. IntelliJ IDEA에서 프로젝트 디렉터리 열기
 2. Gradle 탭에서 `Tasks` > `intellij` > `buildPlugin` 더블클릭
 3. `build/distributions/` 폴더에서 ZIP 파일 확인
 
@@ -78,49 +96,6 @@ Include: *.json;*.xml;*.yaml;*.yml
 Exclude:
 ```
 
-## Gradle 9.x 문제 해결
-
-현재 시스템에 Gradle 9.2.1이 설치되어 있습니다. IntelliJ 플러그인과 호환성 문제가 있을 수 있습니다.
-
-### 해결 방법 1: SDKMAN으로 Gradle 8.5 설치
-
-```bash
-# SDKMAN 설치 (아직 없다면)
-curl -s "https://get.sdkman.io" | bash
-source "$HOME/.sdkman/bin/sdkman-init.sh"
-
-# Gradle 8.5 설치 및 사용
-sdk install gradle 8.5
-sdk use gradle 8.5
-
-# 빌드
-cd /Users/devsisters/dev/rider-pr-filter
-gradle buildPlugin
-```
-
-### 해결 방법 2: Homebrew로 설치
-
-```bash
-# Gradle 8.x 설치
-brew install gradle@8
-
-# PATH 설정
-export PATH="/opt/homebrew/opt/gradle@8/bin:$PATH"
-
-# 빌드
-cd /Users/devsisters/dev/rider-pr-filter
-gradle buildPlugin
-```
-
-### 해결 방법 3: IntelliJ IDEA 사용 (가장 쉬움)
-
-IntelliJ IDEA는 자체 Gradle 래퍼를 사용하므로 버전 충돌이 없습니다.
-
-1. IntelliJ IDEA 실행
-2. `Open` > `/Users/devsisters/dev/rider-pr-filter` 선택
-3. Gradle 프로젝트가 자동으로 로드됨
-4. `Build` > `Build Project` 또는 Gradle 탭에서 `buildPlugin` 실행
-
 ## 문제 해결
 
 ### 빌드 실패 시
@@ -133,7 +108,6 @@ gradle --version
 java -version
 
 # Gradle 캐시 정리
-cd /Users/devsisters/dev/rider-pr-filter
 rm -rf .gradle build
 gradle clean
 gradle buildPlugin

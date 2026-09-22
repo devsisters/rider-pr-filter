@@ -3,6 +3,12 @@
 build/
 !gradle/wrapper/gradle-wrapper.jar
 
+# IntelliJ Platform Gradle Plugin 2.x 작업 디렉터리 (코루틴 에이전트, 샌드박스 메타데이터 등)
+.intellijPlatform/
+
+# Kotlin 2.x 빌드 세션 디렉터리
+.kotlin/
+
 # IntelliJ IDEA / Rider
 .idea/
 *.iml

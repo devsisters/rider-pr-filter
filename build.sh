@@ -10,16 +10,13 @@ echo "======================================"
 GRADLE_VERSION=$(./gradlew --version 2>/dev/null | grep "Gradle" | awk '{print $2}')
 echo "현재 Gradle 버전: $GRADLE_VERSION"
 
-# Gradle 9.x 경고
-if [[ "$GRADLE_VERSION" == 9.* ]]; then
-    echo "⚠️  경고: Gradle 9.x는 호환성 문제가 있을 수 있습니다."
-    echo "   Gradle 8.5 사용을 권장합니다."
-    echo ""
-    read -p "계속 진행하시겠습니까? (y/n) " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        exit 1
-    fi
+# Gradle 9 미만 차단
+# IntelliJ Platform Gradle Plugin 2.x가 Gradle 9.0+ 를 요구한다.
+GRADLE_MAJOR="${GRADLE_VERSION%%.*}"
+if [[ "$GRADLE_MAJOR" =~ ^[0-9]+$ ]] && (( GRADLE_MAJOR < 9 )); then
+    echo "❌ Gradle 9.0 이상이 필요합니다 (현재: $GRADLE_VERSION)."
+    echo "   gradle/wrapper/gradle-wrapper.properties의 distributionUrl을 확인하세요."
+    exit 1
 fi
 
 # 빌드 실행
@@ -65,8 +62,8 @@ else
     echo "======================================"
     echo ""
     echo "문제 해결:"
-    echo "1. JDK 17 이상 확인: java -version"
-    echo "2. Gradle wrapper 업데이트: ./gradlew wrapper --gradle-version 8.5"
+    echo "1. JDK 21 확인: java -version (IntelliJ Platform 2024.2+ 는 JDK 21 필요)"
+    echo "2. Gradle wrapper 업데이트: ./gradlew wrapper --gradle-version 9.7.1"
     echo "3. IntelliJ IDEA에서 프로젝트 열어서 빌드 시도"
     echo ""
     exit 1
