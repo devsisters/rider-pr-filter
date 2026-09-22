@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Rider PR Filter Plugin 릴리즈 스크립트
-# Build → Package → Update XML을 순서대로 실행합니다.
+# Build → Package 를 순서대로 실행합니다.
 # 중간에 실패하면 다음 단계로 진행하지 않습니다.
 
 set -e  # 에러 발생 시 즉시 종료
@@ -48,8 +48,9 @@ echo -e "${BOLD}║   Rider PR Filter Plugin 릴리즈 시작  ║${NC}"
 echo -e "${BOLD}╚════════════════════════════════════════╝${NC}"
 echo ""
 
-# 버전 확인
-VERSION=$(grep '^version = ' build.gradle.kts | sed 's/version = "\(.*\)"/\1/')
+# 버전 확인 (gradle.properties 의 pluginVersion 단일 출처)
+source "$SCRIPT_DIR/version.sh"
+VERSION="$PLUGIN_VERSION"
 echo -e "릴리즈 버전: ${YELLOW}${BOLD}v${VERSION}${NC}"
 echo ""
 
@@ -64,7 +65,7 @@ fi
 # ============================================
 # 1단계: 빌드
 # ============================================
-print_step "1/3 단계: 플러그인 빌드 중..."
+print_step "1/2 단계: 플러그인 빌드 중..."
 
 # Gradle 버전 확인
 GRADLE_VERSION=$(./gradlew --version 2>/dev/null | grep "Gradle" | awk '{print $2}')
@@ -83,7 +84,7 @@ fi
 
 if [ $? -eq 0 ]; then
     print_success "빌드 완료!"
-    PLUGIN_ZIP="build/distributions/rider-pr-filter-${VERSION}.zip"
+    PLUGIN_ZIP="$PLUGIN_ZIP_PATH"
     if [ -f "$PLUGIN_ZIP" ]; then
         echo -e "생성된 파일: ${GREEN}${PLUGIN_ZIP}${NC}"
         FILE_SIZE=$(du -h "$PLUGIN_ZIP" | cut -f1)
@@ -104,7 +105,7 @@ fi
 # ============================================
 # 2단계: 패키징
 # ============================================
-print_step "2/3 단계: 배포용 패키지 생성 중..."
+print_step "2/2 단계: 배포용 패키지 생성 중..."
 
 # package.sh 실행
 ./package.sh
@@ -123,25 +124,6 @@ else
 fi
 
 # ============================================
-# 3단계: updatePlugins.xml 업데이트
-# ============================================
-print_step "3/3 단계: updatePlugins.xml 업데이트 중..."
-
-# GitHub 레포 설정 (필요시 변경)
-GITHUB_REPO="junseokoh-dev/rider-pr-filter"
-
-# update-plugin-xml.sh 실행
-./update-plugin-xml.sh "$VERSION" "$GITHUB_REPO"
-
-if [ $? -eq 0 ]; then
-    print_success "updatePlugins.xml 업데이트 완료!"
-else
-    print_error "updatePlugins.xml 업데이트 실패!"
-    echo -e "${RED}에러: XML 업데이트 스크립트가 실패했습니다.${NC}"
-    exit 1
-fi
-
-# ============================================
 # 완료 메시지
 # ============================================
 echo ""
@@ -150,25 +132,20 @@ echo -e "${GREEN}${BOLD}║      🎉 릴리즈 준비 완료! 🎉          ║
 echo -e "${GREEN}${BOLD}╚════════════════════════════════════════╝${NC}"
 echo ""
 echo -e "${BOLD}생성된 파일:${NC}"
-echo -e "  📦 플러그인: ${GREEN}build/distributions/rider-pr-filter-${VERSION}.zip${NC}"
+echo -e "  📦 플러그인: ${GREEN}${PLUGIN_ZIP_PATH}${NC}"
 echo -e "  📦 배포 패키지: ${GREEN}distribution/rider-pr-filter.zip${NC}"
-echo -e "  📄 업데이트 정보: ${GREEN}updatePlugins.xml${NC}"
 echo ""
 echo -e "${BOLD}다음 단계:${NC}"
 echo ""
 echo -e "${YELLOW}1. GitHub Release 생성${NC}"
 echo -e "   ${BLUE}gh release create v${VERSION} \\${NC}"
-echo -e "   ${BLUE}  build/distributions/rider-pr-filter-${VERSION}.zip \\${NC}"
+echo -e "   ${BLUE}  ${PLUGIN_ZIP_PATH} \\${NC}"
 echo -e "   ${BLUE}  --title \"v${VERSION}\" \\${NC}"
 echo -e "   ${BLUE}  --notes \"릴리즈 노트 작성\"${NC}"
 echo ""
-echo -e "${YELLOW}2. updatePlugins.xml 호스팅${NC}"
-echo -e "   GitHub Pages, S3 등에 업로드:"
-echo -e "   ${BLUE}https://junseokoh-dev.github.io/rider-pr-filter/updatePlugins.xml${NC}"
-echo ""
-echo -e "${YELLOW}3. 사용자 안내${NC}"
-echo -e "   Rider → Settings → Plugins → ⚙️ → Manage Plugin Repositories"
-echo -e "   Custom Repository URL 추가"
+echo -e "${YELLOW}2. 사용자 배포${NC}"
+echo -e "   ${GREEN}distribution/rider-pr-filter.zip${NC} 을 전달하면"
+echo -e "   사용자는 압축 해제 후 ${BLUE}./install.sh${NC} 만 실행하면 됩니다."
 echo ""
 echo -e "${GREEN}모든 작업이 완료되었습니다!${NC}"
 echo ""

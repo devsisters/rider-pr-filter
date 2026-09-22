@@ -9,7 +9,10 @@ plugins {
 }
 
 group = "com.devsisters"
-version = "1.0.1"
+
+// 버전 단일 출처는 gradle.properties 의 pluginVersion.
+// 셸 스크립트(version.sh)도 같은 값을 읽으므로 여기에 리터럴을 두지 않는다.
+version = providers.gradleProperty("pluginVersion").get()
 
 repositories {
     mavenCentral()

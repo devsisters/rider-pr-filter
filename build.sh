@@ -2,6 +2,9 @@
 
 # Rider PR Filter Plugin Build Script
 
+# 버전은 gradle.properties 의 pluginVersion 하나만 본다.
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/version.sh"
+
 echo "======================================"
 echo "Rider PR Filter Plugin 빌드 시작"
 echo "======================================"
@@ -30,7 +33,7 @@ if [ $? -eq 0 ]; then
     echo "✅ 빌드 성공!"
     echo "======================================"
     echo ""
-    echo "생성된 파일: build/distributions/rider-pr-filter-1.0.1.zip"
+    echo "생성된 파일: $PLUGIN_ZIP_PATH"
     echo ""
     echo "설치 방법:"
     echo ""
@@ -44,7 +47,7 @@ if [ $? -eq 0 ]; then
     echo "  1. Rider 열기"
     echo "  2. Settings > Plugins"
     echo "  3. 톱니바퀴 > Install Plugin from Disk..."
-    echo "  4. build/distributions/rider-pr-filter-1.0.1.zip 선택"
+    echo "  4. $PLUGIN_ZIP_PATH 선택"
     echo "  5. Rider 재시작"
     echo ""
 

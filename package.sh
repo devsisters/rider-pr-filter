@@ -5,12 +5,15 @@
 
 set -e
 
+# 버전은 gradle.properties 의 pluginVersion 하나만 본다.
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/version.sh"
+
 echo "======================================"
 echo "Rider PR Filter Plugin 패키징"
 echo "======================================"
 echo ""
 
-PLUGIN_ZIP="build/distributions/rider-pr-filter-1.0.1.zip"
+PLUGIN_ZIP="$PLUGIN_ZIP_PATH"
 PACKAGE_DIR="build/package"
 DISTRIBUTION_DIR="distribution"
 OUTPUT_ZIP="$DISTRIBUTION_DIR/rider-pr-filter.zip"
@@ -38,7 +41,7 @@ chmod +x "$PACKAGE_DIR/install.sh"
 echo "3. 배포용 ZIP 생성 중..."
 rm -f "$OUTPUT_ZIP"
 cd "$PACKAGE_DIR"
-zip -q "../../distribution/rider-pr-filter.zip" rider-pr-filter-1.0.1.zip install.sh
+zip -q "../../distribution/rider-pr-filter.zip" "$PLUGIN_ZIP_NAME" install.sh
 cd ../..
 
 echo "✅ 패키징 완료"

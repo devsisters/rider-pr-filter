@@ -5,8 +5,6 @@
 set -e
 
 PLUGIN_NAME="rider-pr-filter"
-PLUGIN_VERSION="1.0.1"
-PLUGIN_ZIP_NAME="${PLUGIN_NAME}-${PLUGIN_VERSION}.zip"
 PLUGIN_DIR_NAME="rider-pr-filter"
 
 echo "======================================"
@@ -14,29 +12,52 @@ echo "Rider PR Filter Plugin 설치"
 echo "======================================"
 echo ""
 
-# 빌드 파일 찾기 (배포판 또는 개발 환경)
+# 이 스크립트는 배포 ZIP 안에 단독으로 들어가므로 gradle.properties 를 읽을 수 없다.
+# 대신 실제로 찾은 ZIP 파일명에서 버전을 역으로 읽어 버전 문자열을 하드코딩하지 않는다.
 PLUGIN_ZIP=""
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# 후보 경로에서 가장 최근에 수정된 플러그인 ZIP 하나를 고른다.
+find_plugin_zip() {
+    local dir="$1"
+    local newest=""
+    local candidate
+    for candidate in "$dir/$PLUGIN_NAME"-*.zip; do
+        [ -f "$candidate" ] || continue
+        if [ -z "$newest" ] || [ "$candidate" -nt "$newest" ]; then
+            newest="$candidate"
+        fi
+    done
+    [ -n "$newest" ] && printf '%s' "$newest"
+}
+
 # 1. 배포판 경로 확인 (install.sh와 같은 디렉토리)
-if [ -f "$SCRIPT_DIR/$PLUGIN_ZIP_NAME" ]; then
-    PLUGIN_ZIP="$SCRIPT_DIR/$PLUGIN_ZIP_NAME"
-    echo "📦 배포판 플러그인 발견: $PLUGIN_ZIP_NAME"
-# 2. 개발 환경 경로 확인
-elif [ -f "$SCRIPT_DIR/build/distributions/$PLUGIN_ZIP_NAME" ]; then
-    PLUGIN_ZIP="$SCRIPT_DIR/build/distributions/$PLUGIN_ZIP_NAME"
-    echo "🔨 개발 빌드 플러그인 발견: build/distributions/$PLUGIN_ZIP_NAME"
+PLUGIN_ZIP=$(find_plugin_zip "$SCRIPT_DIR")
+if [ -n "$PLUGIN_ZIP" ]; then
+    echo "📦 배포판 플러그인 발견: $(basename "$PLUGIN_ZIP")"
 else
-    echo "❌ 플러그인 파일을 찾을 수 없습니다."
-    echo ""
-    echo "다음 위치를 확인했습니다:"
-    echo "  - $SCRIPT_DIR/$PLUGIN_ZIP_NAME (배포판)"
-    echo "  - $SCRIPT_DIR/build/distributions/$PLUGIN_ZIP_NAME (개발)"
-    echo ""
-    echo "개발 환경이라면 먼저 빌드를 실행하세요:"
-    echo "  ./build.sh 또는 ./gradlew buildPlugin"
-    exit 1
+    # 2. 개발 환경 경로 확인
+    PLUGIN_ZIP=$(find_plugin_zip "$SCRIPT_DIR/build/distributions")
+    if [ -n "$PLUGIN_ZIP" ]; then
+        echo "🔨 개발 빌드 플러그인 발견: build/distributions/$(basename "$PLUGIN_ZIP")"
+    else
+        echo "❌ 플러그인 파일을 찾을 수 없습니다."
+        echo ""
+        echo "다음 위치를 확인했습니다:"
+        echo "  - $SCRIPT_DIR/$PLUGIN_NAME-*.zip (배포판)"
+        echo "  - $SCRIPT_DIR/build/distributions/$PLUGIN_NAME-*.zip (개발)"
+        echo ""
+        echo "개발 환경이라면 먼저 빌드를 실행하세요:"
+        echo "  ./build.sh 또는 ./gradlew buildPlugin"
+        exit 1
+    fi
 fi
+
+# rider-pr-filter-1.2.3.zip -> 1.2.3
+PLUGIN_ZIP_NAME="$(basename "$PLUGIN_ZIP")"
+PLUGIN_VERSION="${PLUGIN_ZIP_NAME#"$PLUGIN_NAME"-}"
+PLUGIN_VERSION="${PLUGIN_VERSION%.zip}"
+echo "   버전: $PLUGIN_VERSION"
 
 # Rider 플러그인 디렉토리 찾기 (macOS)
 RIDER_PLUGINS_BASE="$HOME/Library/Application Support/JetBrains"
