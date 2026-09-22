@@ -55,7 +55,7 @@ Wrapper가 필요한 Gradle 버전을 알아서 받아오므로 Gradle을 따로
 2. `Settings` (⌘,) > `Plugins` 이동
 3. 톱니바퀴 아이콘 ⚙️ 클릭
 4. `Install Plugin from Disk...` 선택
-5. `build/distributions/rider-pr-filter-1.0.0.zip` 선택
+5. `build/distributions/rider-pr-filter-1.0.1.zip` 선택
 6. `OK` 클릭
 7. **Rider 재시작**
 

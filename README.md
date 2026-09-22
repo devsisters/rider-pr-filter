@@ -40,7 +40,7 @@ Rider의 Github Pull Request View에서 파일을 확장자 패턴으로 필터�
 gradle buildPlugin
 ```
 
-빌드가 완료되면 `build/distributions/rider-pr-filter-1.0.0.zip` 파일이 생성됩니다.
+빌드가 완료되면 `build/distributions/rider-pr-filter-1.0.1.zip` 파일이 생성됩니다.
 
 ### 설치 방법
 
@@ -68,7 +68,7 @@ gradle buildPlugin
 1. Rider를 엽니다
 2. `Settings` (또는 `Preferences`) > `Plugins` 이동
 3. 톱니바퀴 아이콘 클릭 > `Install Plugin from Disk...` 선택
-4. `build/distributions/rider-pr-filter-1.0.0.zip` 파일 선택
+4. `build/distributions/rider-pr-filter-1.0.1.zip` 파일 선택
 5. Rider 재시작
 
 ## 사용 방법

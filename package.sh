@@ -10,7 +10,7 @@ echo "Rider PR Filter Plugin 패키징"
 echo "======================================"
 echo ""
 
-PLUGIN_ZIP="build/distributions/rider-pr-filter-1.0.0.zip"
+PLUGIN_ZIP="build/distributions/rider-pr-filter-1.0.1.zip"
 PACKAGE_DIR="build/package"
 DISTRIBUTION_DIR="distribution"
 OUTPUT_ZIP="$DISTRIBUTION_DIR/rider-pr-filter.zip"
@@ -38,7 +38,7 @@ chmod +x "$PACKAGE_DIR/install.sh"
 echo "3. 배포용 ZIP 생성 중..."
 rm -f "$OUTPUT_ZIP"
 cd "$PACKAGE_DIR"
-zip -q "../../distribution/rider-pr-filter.zip" rider-pr-filter-1.0.0.zip install.sh
+zip -q "../../distribution/rider-pr-filter.zip" rider-pr-filter-1.0.1.zip install.sh
 cd ../..
 
 echo "✅ 패키징 완료"

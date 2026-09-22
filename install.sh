@@ -5,7 +5,7 @@
 set -e
 
 PLUGIN_NAME="rider-pr-filter"
-PLUGIN_VERSION="1.0.0"
+PLUGIN_VERSION="1.0.1"
 PLUGIN_ZIP_NAME="${PLUGIN_NAME}-${PLUGIN_VERSION}.zip"
 PLUGIN_DIR_NAME="rider-pr-filter"
 
